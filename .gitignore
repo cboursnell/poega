@@ -1,0 +1,7 @@
+.classpath
+.project
+*.jpg
+bin
+*.data
+*.png
+*.txt
