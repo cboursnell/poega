@@ -35,7 +35,8 @@ public class Node implements Serializable {
 	private ArrayList<Mod> mods;      // parsed string
 	private ArrayList<Integer> links; // list of the id of neighbouring nodes
 
-	private ArrayList<Integer> distances; // a list of the distances to other nodes in the tree.
+//	private ArrayList<Integer> distances; // a list of the distances to other nodes in the tree.
+	private int[] distances;
 
 	//TODO add storage of location of graphics
 
@@ -49,7 +50,8 @@ public class Node implements Serializable {
 		//effects = new ArrayList<String>();
 		mods = new ArrayList<Mod>();
 		links = new ArrayList<Integer>();
-		distances = new ArrayList<Integer>();
+//		distances = new ArrayList<Integer>();
+		distances = new int[1472];
 		this.description="";
 		this.keystone = false;
 		this.notable = false;
@@ -129,7 +131,7 @@ public class Node implements Serializable {
 		return mods.size();
 	}
 
-	public void setDistance(int index, int distance) {
+	/*public void setDistance(int index, int distance) {
 		while (index > distances.size()-1) {
 			distances.add(-1);
 		}
@@ -142,6 +144,14 @@ public class Node implements Serializable {
 		} else {
 			return distances.get(i);
 		}
+	}*/
+
+	public void setDistance(int index, int distance) {
+		distances[index] = distance;
+	}
+
+	public int getDistance(int i) { // how far is it from this node to node i
+		return distances[i];
 	}
 
 	public String toString() {

@@ -105,7 +105,26 @@ public class Build {
 		//System.out.println("Total life = "+ life);
 	}
 	
-	public void heuristic(Target target) { // TODO possibly change it so that it is distance from nearest build keynode
+	public void heuristic(Target target) {
+		// for each mod
+		//   if unique
+		//      calculate distance from target node to all selected nodes
+		//      choose the closest
+		//      score based on distance
+		//   else
+		//      sum all selected nodes with target mod
+		//      score based on proportion of maximum
+		//      for each target nodes
+		//         calculate distance to all selected nodes
+		//         choose the closest
+		//      end
+		//      score based on total distance
+		//   end
+		// end
+		// combine all scores to calculate a euclidean distance from origin
+	}
+	
+	/*public void heuristic(Target target) { // TODO possibly change it so that it is distance from nearest build keynode
 		// TODO add a scoring system that punishes having too many points. target should contain a number points to spend
 		//      punish builds for going over that
 		//System.out.println("heuristic:");
@@ -113,7 +132,7 @@ public class Build {
 		String key;
 		score=0.05; // base score so that roulette wheel selection is more random
 		for(int i = 0 ; i < target.getNumberOfMods(); i++) {        // for each mod in the target 
-			                                                        //compare to what's in the summary and see how well we did
+//			                                                        // compare to what's in the summary and see how well we did
 			targetmod = target.getMod(i);
 			
 			if (targetmod.getValue()==0) { // unique keystone
@@ -139,13 +158,6 @@ public class Build {
 
 					float bestdistance=2000.0f;
 					if(nodeIndex>=0) {
-//						for (int a=0; a < activatedNodes.length; a++) {
-//							if (activatedNodes[a]==1) { // TODO instead of activated nodes use build keynodes ?
-//								if (model.getNode(nodeIndex).getDistance(a) < bestdistance) {
-//									bestdistance = model.getNode(nodeIndex).getDistance(a);
-//								}
-//							}
-						//						}
 						for (int a=0; a < keyNodes.size(); a++) {
 							if (model.getNode(nodeIndex).getDistance(hash.get(keyNodes.get(a).getId())) < bestdistance) {
 								bestdistance = model.getNode(nodeIndex).getDistance(a);
@@ -191,7 +203,7 @@ public class Build {
 //		if(points < maxpoints) {
 //			score *= ( 1 - Math.pow(((maxpoints-points)/1284), 0.5) );
 //		}
-	}
+	}*/
 
 	// 
 	public void summary() {
@@ -359,11 +371,20 @@ public class Build {
 		this.score = score;
 	}
 	
+	public int getLevel() {
+		return level;
+	}
+
+	public void setLevel(int level) {
+		this.level = level;
+	}
+
 	public Build dupe() {
 		Build b = new Build(activatedNodes.length, model, hash);
 		for(int i = 0; i < keyNodes.size(); i++) {
 			b.addKeyNode(this.keyNodes.get(i));
 		}
+		b.setLevel(level);
 		b.setStart(start);
 		return b;
 	}

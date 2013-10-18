@@ -73,7 +73,7 @@ public class Model {
 	private Build build;
 	
 	private int startingPopulationSize = 20;
-	private int startingKeyNodes = 6;
+	private int startingKeyNodes = 5;
 	
 
 	private Random ran;
@@ -102,6 +102,7 @@ public class Model {
 		try {
 			sprites = ImageIO.read(new File("spritesheet.jpg"));
 			spritesActive = ImageIO.read(new File("spritesheet_active.jpg"));
+			
 			mastery = ImageIO.read(new File("spritesheet2.png"));
 			ring = ImageIO.read(new File("ring.png"));
 			ringActive = ImageIO.read(new File("ring_active.png"));
@@ -250,6 +251,20 @@ public class Model {
 			b.heuristic(target);
 			set.add(b.hashBits());
 			population.add(b);
+		}
+		
+	}
+	
+	public void newgeneration() {
+		// find the highest scoring build
+		double bestscore=0;
+		for(int i = 1; i < population.size(); i++) {
+			double score = population.get(i).getScore();
+			System.out.println(population.get(i).getNumberOfKeyNodes()+" "+score);
+			if (score>bestscore) {
+				bestscore = population.get(i).getScore();
+				build = population.get(i);
+			}
 		}
 		
 	}
@@ -781,6 +796,7 @@ public class Model {
 
 	@SuppressWarnings("unchecked")
 	public boolean load() {
+		System.out.println("Running load()");
 		boolean loading=false;
 		try{
 			//use buffering

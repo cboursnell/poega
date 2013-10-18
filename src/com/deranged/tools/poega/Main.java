@@ -331,7 +331,7 @@ public class Main {
 				model.init();
 				for (int g = 0 ; g < 15; g++) {
 					model.generation();
-					panel.repaint();
+//					panel.repaint();
 				}
 			}
 		});

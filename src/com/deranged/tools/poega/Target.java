@@ -58,4 +58,12 @@ public class Target {
 	public void setWeight(int row, Object valueAt) {
 		weights.set(row, Float.parseFloat((String)valueAt));
 	}
+
+	public ArrayList<Mod> getTargetMods() {
+		return targetMods;
+	}
+
+	public void setTargetMods(ArrayList<Mod> targetMods) {
+		this.targetMods = targetMods;
+	}
 }
