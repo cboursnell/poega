@@ -73,7 +73,7 @@ public class Model {
 	private Build build;
 	
 	private int startingPopulationSize = 20;
-	private int startingKeyNodes = 5;
+	private int startingKeyNodes = 1;
 	
 
 	private Random ran;
@@ -134,10 +134,10 @@ public class Model {
 			nodes.get(hash.get(classStartingNodes[c])).setClassStart(true);
 		}
 		
-		for(int n = 0 ; n < nodes.size(); n++) {
-			for(int m = 0; m < nodes.get(n).getNumberOfMods(); m++) {
-				//System.out.println("adding "+nodes.get(n).getMod(m).getDesc()+" to mod totals");
+		for(int n = 0 ; n < nodes.size(); n++) { // for each node
+			for(int m = 0; m < nodes.get(n).getNumberOfMods(); m++) { // for each mod in the node
 				
+				//System.out.println("adding "+nodes.get(n).getMod(m).getDesc()+" to mod totals");
 				boolean found = false;
 				Iterator<Mod> iter = modTotals.iterator();
 				while (iter.hasNext() && !found) {
@@ -273,6 +273,7 @@ public class Model {
 
 		// find the highest scoring build
 		double bestscore=0;
+		System.out.println("Scores:");
 		for(int i = 1; i < population.size(); i++) {
 			double score = population.get(i).getScore();
 			System.out.println(population.get(i).getNumberOfKeyNodes()+" "+score);
@@ -282,12 +283,13 @@ public class Model {
 			}
 		}
 		System.out.println("--");
-		
-		// choose 2 random builds and compare them. the highest scoring build
-		// creates a new build with a mutation. repeat until a build is created with
-		// an improved score
-		boolean improved=false;
-		while (!improved) {
+
+		// choose 2 random builds and compare them.
+//		int repeats = (int)Math.floor(population.size());
+		int repeats = 20;
+		System.out.println("Repeats is set to "+repeats);
+		for (int i=0; i < repeats; i++) {
+			System.out.println("Add Repeat : "+i);
 			Build b1 = population.get(ran.nextInt(population.size()));
 			Build b2 = population.get(ran.nextInt(population.size()));
 			Build newbuild;
@@ -299,25 +301,28 @@ public class Model {
 			newbuild.mutate();
 			newbuild.update();
 			newbuild.heuristic(target);
-			if (newbuild.getScore() > bestscore) {
-				bestscore = newbuild.getScore();
-				improved = true;
-				population.add(newbuild);
-			}
+			population.add(newbuild);
 		}
-		// remove 1 build with the lowest score
+
+		// remove x build with the lowest score
 		double worstscore=1000000;
 		int toBeRemoved=-1;
-		for(int i = 1; i < population.size(); i++) {
-			if (population.get(i).getScore() < worstscore) {
-				worstscore = population.get(i).getScore();
-				toBeRemoved = i;
+		repeats = population.size() - 20;
+		for(int j = 0; j < repeats; j++) {
+			toBeRemoved=-1;
+			System.out.println("Remove Repeat : "+j);
+			for(int i = 0; i < population.size(); i++) {
+				if (population.get(i).getScore() < worstscore) {
+					worstscore = population.get(i).getScore();
+					toBeRemoved = i;
+				}
+			}
+			if (toBeRemoved >= 0) {
+				population.remove(toBeRemoved);
+				System.out.println("removed "+toBeRemoved+" for being rubbish");
 			}
 		}
-		if (toBeRemoved >= 0) {
-			population.remove(toBeRemoved);
-		}
-		
+		System.out.println("Population size is now : "+population.size());
 	}
 	
 	/*public void init() {
@@ -417,7 +422,7 @@ public class Model {
 				closed.add(current);
 
 				neighbours.clear();
-				for (int n = 0; n < current.links(); n++) {
+				for (int n = 0; n < current.linksCount(); n++) {
 					neighbours.add(nodes.get(hash.get(current.getLinks(n))));
 				}
 				for (int i = 0; i < neighbours.size(); i++) {
@@ -473,12 +478,12 @@ public class Model {
 			node = nodes.get(n);
 			id = node.getId();                 //   get the id of the node
 			if(!node.isMastery()) {            //   that isn't a mastery node (ie has no connections)
-				neighbours = node.links();     //     get the number of neighbours
+				neighbours = node.linksCount();     //     get the number of neighbours
 				for (int c=0; c <neighbours; c++) {  // for each neighbouring node
 					int nId = node.getLinks(c);      //    get the Id of the neighbour
 					int nIndex = hash.get(nId);      //    get the index of the neighbour
 					nNode = nodes.get(nIndex);       //    get the neighbouring node
-					int nLinks = nNode.links();      //    get the number of neighbours of the neighbouring node
+					int nLinks = nNode.linksCount();      //    get the number of neighbours of the neighbouring node
 					found=false;
 					for (int d=0; d < nLinks; d++) { //    for each of the neighbours of the neighbouring node
 						if (nNode.getLinks(d)==id) {
@@ -1117,7 +1122,7 @@ public class Model {
 	public Icon getSkillIcon(String name) {
 		Icon i = skilliconshash.get(name); 
 		if (i==null) {
-			System.err.println("ERROR <Model.java> icon for "+name+ " is null");
+//			System.err.println("ERROR <Model.java> icon for "+name+ " is null");
 			return null;
 		} else {
 			return i;

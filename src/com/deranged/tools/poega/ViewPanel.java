@@ -103,7 +103,7 @@ public class ViewPanel extends JPanel {
 			int xc = (int)((n.getX()+camX)*scale)+panX;
 			int yc = (int)((n.getY()+camY)*scale)+panY;
 			Node m;
-			for (int j = 0; j < n.links(); j++) {
+			for (int j = 0; j < n.linksCount(); j++) {
 				m=model.getNodeFromId(n.getLinks(j));
 				if (n.getId() > m.getId()) {
 					int x2 = (int)((m.getDx()+camX)*scale)+panX;

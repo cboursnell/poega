@@ -30,6 +30,7 @@ public class Build {
 	private int points; // how many nodes have been activated
 	
 	private double score;
+	private ArrayList<Float> scores;
 
 	public Build(int size, Model model, HashMap<Integer, Integer> hash) {
 		keyNodes = new ArrayList<Node>(); // this is the genotype
@@ -40,9 +41,7 @@ public class Build {
 			activatedNodes[i]=0;
 		}
 		summ = new HashMap<String, Mod>();
-		//summ.put("#tomaximumLife", new Mod("lifepc", 0));
-		//summ.put("#toStrength", new Mod("str", 0));
-		//summ.put("#increasedmaximumLife", new Mod("pluslife", 0));
+		scores = new ArrayList<Float>();
 		level=63;
 		points=0;
 	}
@@ -106,6 +105,7 @@ public class Build {
 	}
 	
 	public void heuristic(Target target) {
+		System.out.println("Heuristicking...");
 		// for each mod
 		//   if unique
 		//      calculate distance from target node to all selected nodes
@@ -122,8 +122,55 @@ public class Build {
 		//   end
 		// end
 		// combine all scores to calculate a euclidean distance from origin
+		scores.clear();
+		Mod targetmod;
+		int noOfModsInTarget = target.getNumberOfMods();
+		for (int i = 0 ; i < noOfModsInTarget; i++) { // for each mod in target
+			targetmod = target.getMod(i);
+			System.out.println("   Looking at target mod " + targetmod.getDesc());
+
+			// look through all the nodes in the model to find one where the
+			// description matches the description on the 'targetmod'
+			//				System.out.println("This target has keystone id of "+targetmod.getKeystoneId());
+			int noOfNodes = model.getNodesCount();
+			int nodeIndex=-1;
+			if (targetmod.getKeystoneId() > 0) {
+				nodeIndex = model.getNodeIndexFromId(targetmod.getKeystoneId());
+			} else {
+				for(int n = 0; n < noOfNodes; n++) {
+					Node node = model.getNode(n);
+					for(int m = 0; m < node.getNumberOfMods(); m++) {
+						if (node.getMod(m).getDesc().equals(targetmod.getDesc())) {
+							nodeIndex = n;
+						}
+					}
+				}
+			}
+			int distance = 40;
+			if (nodeIndex >= 0) {
+				// now find the closest key node in the build
+				for (Node keyNode : keyNodes) {
+					System.out.println("Distance : " + keyNode.getDistance(nodeIndex));
+					if (keyNode.getDistance(nodeIndex) < distance) {
+						distance = keyNode.getDistance(nodeIndex);
+					}
+				}
+				scores.add((float)(40-distance));
+			} else {
+				System.out.println("<Build:heuristic> Couldn't find it!");
+			}
+
+
+		}
+		for(Float f : scores) {
+			score = Math.pow(f, 2);
+		}
+		score = Math.sqrt(score);
+		score /= (1 + (points/1000f));
+
+
 	}
-	
+
 	/*public void heuristic(Target target) { // TODO possibly change it so that it is distance from nearest build keynode
 		// TODO add a scoring system that punishes having too many points. target should contain a number points to spend
 		//      punish builds for going over that
@@ -206,7 +253,8 @@ public class Build {
 	}*/
 
 	// 
-	public void summary() {
+	public void summary() { // summarise the build
+		                    // sum all the similar nodes eg life%, 
 		summ.clear();
 		Node node;
 		String key="";
@@ -259,28 +307,36 @@ public class Build {
 	// these methods should only be run on new Builds and not ones that have been scored already
 	
 	public void mutate() { // TODO add a moveMutate that moves a keynode to a random location
-		double r = Math.random();
-		if(r < 0.2) {
+//		double r = Math.random();
+//		if(r < 0.2) {
+			System.out.println("neighbour mutating...");
 			neighbourMutate();
-		} else if(r < 0.4) {
+			/*} else if(r < 0.4) {
+			System.out.println("add mutating...");
 			addMutate();
 		} else if(r < 0.6) {
+			System.out.println("delete mutating...");
 			deleteMutate();
 		} else if(r < 0.8) {
+			System.out.println("swap mutating...");
 			swapMutate();
 		} else {
+			System.out.println("shuffle mutating...");
 			shuffleMutate();
-		}
+		}*/
 	}
-	
+		
 	public void neighbourMutate() { // move a node to one of its neighbours
 		Random ran = new Random();
 		//System.out.println("<Build> keynodes.size() = " + keyNodes.size());
 		int r = ran.nextInt(keyNodes.size());
 		Node node = keyNodes.get(r);
-		int neighbour = node.getLinks(ran.nextInt(node.links()));
-		node = model.getNodeFromId(neighbour);
-		keyNodes.set(r, node);
+//		int neighbour = node.getLinks(ran.nextInt(node.linksCount()));
+		int neighbour = node.getRandomNeighbour();
+		if (neighbour>=0) {
+			node = model.getNodeFromId(neighbour);
+			keyNodes.set(r, node);
+		}
 	}
 	
 	public void addMutate() { // add a random node (that isn't already there) to the list in a random place
@@ -303,15 +359,19 @@ public class Build {
 	
 	public void swapMutate() { // swap the positions of two nodes in the list
 		Random ran = new Random();
-		int r1 = ran.nextInt(keyNodes.size());
-		int r2=r1;
-		while (r2==r1) {
-			r2 = ran.nextInt(keyNodes.size());
+		if (keyNodes.size()>1) {
+			int r1 = ran.nextInt(keyNodes.size());
+			int r2=r1;
+
+			while (r2==r1) {
+				r2 = ran.nextInt(keyNodes.size());
+			}
+
+			//System.out.println("swap nodes at positions "+r1+" & "+r2);
+			Node tmp = keyNodes.get(r1);
+			keyNodes.set(r1, keyNodes.get(r2));
+			keyNodes.set(r2, tmp);
 		}
-		//System.out.println("swap nodes at positions "+r1+" & "+r2);
-		Node tmp = keyNodes.get(r1);
-		keyNodes.set(r1, keyNodes.get(r2));
-		keyNodes.set(r2, tmp);
 	}
 	
 	public void shuffleMutate() { // shuffle the order of all the nodes in the list

@@ -2,6 +2,7 @@ package com.deranged.tools.poega;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -285,6 +286,9 @@ public class Node implements Serializable {
 	}
 
 	public void setKeystone(boolean keystone) {
+		if (keystone) {
+			System.out.println("found a true keystone "+description);
+		}
 		this.keystone = keystone;
 	}
 
@@ -292,8 +296,23 @@ public class Node implements Serializable {
 		this.notable = notable;
 	}
 
-	public int links() {
+	public int linksCount() {
+		if (links.size()<0) {
+			System.out.println("WTF How can an arraylist have a negative length...");
+		}
 		return links.size();
+	}
+	
+	public int getRandomNeighbour() {
+		int size = links.size();
+		if (size <= 0) {
+			System.out.println("WTF, how can an arraylist have negative length");
+			return -1;
+		} else {
+			Random random = new Random();
+			int r = random.nextInt(size);
+			return links.get(r);
+		}
 	}
 
 	public void setMastery(boolean mastery) {

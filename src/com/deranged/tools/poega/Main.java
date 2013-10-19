@@ -44,7 +44,8 @@ public class Main {
 	//      tournament selection
 	
 	// TODO niching?
-	//      cluster the builds based on some similarity score and try to discourage clustering      
+	//      cluster the builds based on some similarity score and try to discourage clustering     
+	//      can also do recombination only between clustered builds
 
 	private JFrame     frame;
 	private ViewPanel    panel;
@@ -132,6 +133,7 @@ public class Main {
 		});
 		//frame.setBounds(0, 0, model.getFrameWidth(), model.getFrameHeight());
 		frame.setBounds(-1800, 0, 1800, 1000);
+//		frame.setBounds(0, 0, 1800, 1000);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		panel = new ViewPanel(model);
@@ -329,9 +331,9 @@ public class Main {
 		btnGo.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
 				model.init();
-				for (int g = 0 ; g < 15; g++) {
+				for (int g = 0 ; g < 20; g++) {
 					model.generation();
-//					panel.repaint();
+					panel.repaint();
 				}
 			}
 		});
